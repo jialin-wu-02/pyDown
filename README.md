@@ -1,2 +1,2 @@
 # pyDown
-🐍A Python Markdown Parser
+A Python Markdown Parser
