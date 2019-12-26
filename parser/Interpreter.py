@@ -41,10 +41,10 @@ class Interpreter(object):
     
     def headline(self):
         level = 0
-        while self.current_char is not None and self.current_char == '#' and level <= 3:
+        while self.current_char is not None and self.current_char == '#':
             level += 1
             self.move()
-        if (self.current_char.isspace()):
+        if (self.current_char is not None and self.current_char.isspace()):
             return Token(HEADLINE, level)
         else:
             return Token(WORD, "#" * level)
@@ -95,20 +95,30 @@ class Interpreter(object):
     def expr(self):
         """Interpreter
 
+        expr -> WORD
         expr -> HEADLINE WORD
+        expr -> HEADLINE WORD HEADLINE
         """
         # set current token to the first token taken from the input
         self.current_token = self.get_next_token()
         left = self.current_token
-        self.eat(HEADLINE)
+        try:
+            self.eat(HEADLINE)
+        except:
+            self.eat(WORD)
+            return "<p> " + left.value + " </p>"
+
         mid = self.current_token
         self.eat(WORD)
-
 
         level = str(left.value)
         result = "<h" + level + ">" + mid.value + " </h" + level + ">"
 
-        return result
+        if self.current_token.type == HEADLINE:
+            self.eat(HEADLINE)
+            return result
+        else:
+            return result
 
 
 def main():
